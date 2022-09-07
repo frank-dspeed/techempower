@@ -23,7 +23,7 @@ const {
 
 async function main () {
   const spray = sprayer(maxQuery)
-  const getRandom = () => Math.ceil(Math.random() * maxRows)
+  const getRandomNumber = () => Math.ceil(Math.random() * maxRows)
   const getCount = (qs = { q: 1 }) => {
     return Math.min(parseInt((qs.q) || 1, 10), maxQuery) || 1
   }
@@ -42,8 +42,8 @@ async function main () {
   const getFortunes = await pg.compile(fortunes)
   const worldCache = new SimpleCache(id => getWorldById(id))
   const template = html.load(templates.fortunes, templates.settings)
-  const getRandomWorld = () => getWorldById(getRandom())
-  const getCachedWorld = () => worldCache.get(getRandom())
+  const getRandomWorld = async () => getWorldById(getRandomNumber())
+  const getCachedWorld = async () => worldCache.get(getRandomNumber())
 
   const server = createServer()
     .get('/plaintext', res => res.text(message))
@@ -65,7 +65,7 @@ async function main () {
       const worlds = await Promise.all(spray(count, getRandomWorld))
       const updateWorlds = await getUpdateQuery(count, pg)
       await updateWorlds(...worlds.map(w => {
-        w.randomnumber = getRandom()
+        w.randomnumber = getRandomNumber()
         return [w.id, w.randomnumber]
       }).flat())
       res.json(worlds)
