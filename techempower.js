@@ -64,10 +64,10 @@ async function main () {
       const count = getCount(req.query)
       const worlds = await Promise.all(spray(count, getRandomWorld))
       const updateWorlds = await getUpdateQuery(count, pg)
-      await updateWorlds(...worlds.map(w => {
+      await updateWorlds(...worlds.flatMap(w => {
         w.randomnumber = getRandomNumber()
         return [w.id, w.randomnumber]
-      }).flat())
+      }))
       res.json(worlds)
     })
     .listen('0.0.0.0', 8080)
